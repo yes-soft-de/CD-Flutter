@@ -41,7 +41,7 @@ jobs:
     # Build apk.
       name: build-apk
       needs: [Flutter-Test]
-      runs-on: 
+      runs-on: ubuntu-latest
       steps:
         - uses: actions/checkout@@v2
         - uses: actions/setup-java@v1
