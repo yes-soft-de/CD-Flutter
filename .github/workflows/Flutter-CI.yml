@@ -51,7 +51,8 @@ jobs:
 #           with:
 #            channel: "beta"
 #         - run: flutter pub get
-#   - run: flutter clean  
+#   - run: flutter clean 
+ 
     - name: Sign AAB
       id: sign
       uses: r0adkll/sign-android-release@v1
@@ -77,6 +78,7 @@ jobs:
 #           KEYSTORE_KEY_ALIAS: ${{ secrets.KEYSTORE_KEY_ALIAS }}
 #           KEYSTORE_KEY_PASSWORD: ${{ secrets.KEYSTORE_KEY_PASSWORD }}
 #           KEYSTORE_STORE_PASSWORD: ${{ secrets.KEYSTORE_STORE_PASSWORD }}
+
     - name: Release APK    
       run: flutter build apk
     # Upload generated apk to the artifacts.
@@ -88,6 +90,7 @@ jobs:
     - name: Create service_account.json
       id: createServiceAccount
       run: echo '${{ secrets.PLAY_CONFIG_JSON }}' > service_account.json
+      
 #     - name: Create Google Play Config file
 #       run : |
 #           cd ./android
