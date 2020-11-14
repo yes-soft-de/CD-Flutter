@@ -109,7 +109,7 @@ jobs:
        packageName: com.package
        releaseFile: build/app/outputs/apk/release/app-release.apk
        track: beta
-       whatsNewDirectory: whatsnew/ 
+   
 #   Build-IOS:    
 #     # Build IOS.
 #       name: Build-IOS
