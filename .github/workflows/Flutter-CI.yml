@@ -105,7 +105,7 @@ jobs:
       
     - name: Create service_account.json
       id: createServiceAccount
-      run: echo '${{ secrets.$PLAY_CONFIG_JSON }}' > service_account.json
+      run: echo '${{ secrets.PLAY_CONFIG_JSON }}' > service_account.json
       
     - name: Deploy to Play Store (BETA)
       id: deploy
