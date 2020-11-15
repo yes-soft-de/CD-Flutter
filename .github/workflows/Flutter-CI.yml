@@ -62,35 +62,60 @@ jobs:
 #         alias: ${{ secrets.ALIAS }}
 #         keyStorePassword: ${{ secrets.KEY_STORE_PASSWORD }}
 #         keyPassword: ${{ secrets.KEY_PASSWORD }}
-        
-    - name: Configure Keystore
-      run: |
-          cd ./android
-          echo "$ANDROID_KEYSTORE_FILE" > keystore.jks.b64
-          base64 -d -i keystore.jks.b64 > keystore.jks
-          echo "storeFile=../keystore.jks" > keystore.properties
-          echo "keyAlias=$KEYSTORE_KEY_ALIAS" >> keystore.properties
-          echo "storePassword=$KEYSTORE_STORE_PASSWORD" >> keystore.properties
-          echo "keyPassword=$KEYSTORE_KEY_PASSWORD" >> keystore.properties
-          ls
-      env: 
-          ANDROID_KEYSTORE_FILE: ${{ secrets.ANDROID_KEYSTORE_FILE }}
-          KEYSTORE_KEY_ALIAS: ${{ secrets.KEYSTORE_KEY_ALIAS }}
-          KEYSTORE_KEY_PASSWORD: ${{ secrets.KEYSTORE_KEY_PASSWORD }}
-          KEYSTORE_STORE_PASSWORD: ${{ secrets.KEYSTORE_STORE_PASSWORD }}
 
-    - name: Release APK    
-      run: flutter build apk
-    # Upload generated apk to the artifacts.
-    - uses: actions/upload-artifact@v1
+    - name: Sign AAB
+      id: sign
+      uses: r0adkll/sign-android-release@v1
       with:
-         name: release-apk
-         path: build/app/outputs/apk/release/app-release.apk 
+        releaseDirectory: app/build/outputs/bundle/release
+        signingKeyBase64: ${{ secrets.SIGNING_KEY }}
+        alias: ${{ secrets.ALIAS }}
+        keyStorePassword: ${{ secrets.KEY_STORE_PASSWORD }}
+        keyPassword: ${{ secrets.KEY_PASSWORD }}
+        
+#     - name: Configure Keystore
+#       run: |
+#           cd ./android
+#           echo "$ANDROID_KEYSTORE_FILE" > keystore.jks.b64
+#           base64 -d -i keystore.jks.b64 > keystore.jks
+#           echo "storeFile=../keystore.jks" > keystore.properties
+#           echo "keyAlias=$KEYSTORE_KEY_ALIAS" >> keystore.properties
+#           echo "storePassword=$KEYSTORE_STORE_PASSWORD" >> keystore.properties
+#           echo "keyPassword=$KEYSTORE_KEY_PASSWORD" >> keystore.properties
+#           ls
+#       env: 
+#           ANDROID_KEYSTORE_FILE: ${{ secrets.ANDROID_KEYSTORE_FILE }}
+#           KEYSTORE_KEY_ALIAS: ${{ secrets.KEYSTORE_KEY_ALIAS }}
+#           KEYSTORE_KEY_PASSWORD: ${{ secrets.KEYSTORE_KEY_PASSWORD }}
+#           KEYSTORE_STORE_PASSWORD: ${{ secrets.KEYSTORE_STORE_PASSWORD }}
+
+#     - name: Release APK    
+#       run: flutter build apk
+#     # Upload generated apk to the artifacts.
+#     - uses: actions/upload-artifact@v1
+#       with:
+#          name: release-apk
+#          path: build/app/outputs/apk/release/app-release.apk 
+    - name: Upload AAB
+      id: uploadArtifact
+      uses: actions/upload-artifact@v1
+      with:
+          name: app
+          path: app/build/outputs/bundle/release/app-release.aab
       
     - name: Create service_account.json
       id: createServiceAccount
-      run: echo '${{ secrets.PLAY_CONFIG_JSON }}' > service_account.json
+      run: echo '${{ secrets.$PLAY_CONFIG_JSON }}' > service_account.json
       
+    - name: Deploy to Play Store (BETA)
+      id: deploy
+      uses: r0adkll/upload-google-play@v1
+      with:
+        serviceAccountJson: service_account.json
+        packageName: com.package
+        releaseFile: app/build/outputs/bundle/release/app-release.aab
+        track: beta
+        whatsNewDirectory: whatsnew/
 #     - name: Create Google Play Config file
 #       run : |
 #           cd ./android
@@ -101,14 +126,14 @@ jobs:
 #           PLAY_CONFIG_JSON: ${{ secrets.PLAY_CONFIG_JSON }}  
           
           
-    - name: Deploy to Play Store (BETA)
-      id: deploy
-      uses: r0adkll/upload-google-play@v1
-      with:
-       serviceAccountJson: service_account.json
-       packageName: com.example
-       releaseFile: build/app/outputs/apk/release/app-release.apk
-       track: beta
+#     - name: Deploy to Play Store (BETA)
+#       id: deploy
+#       uses: r0adkll/upload-google-play@v1
+#       with:
+#        serviceAccountJson: service_account.json
+#        packageName: com.example
+#        releaseFile: build/app/outputs/apk/release/app-release.apk
+#        track: beta
    
 #   Build-IOS:    
 #     # Build IOS.
