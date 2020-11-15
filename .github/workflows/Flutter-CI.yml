@@ -106,7 +106,7 @@ jobs:
       uses: r0adkll/upload-google-play@v1
       with:
        serviceAccountJson: service_account.json
-       packageName: com.package
+       packageName: com.example
        releaseFile: build/app/outputs/apk/release/app-release.apk
        track: beta
    
